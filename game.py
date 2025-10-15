@@ -17,6 +17,11 @@ class SnakeGame:
         self.clock = pygame.time.Clock()
         self.font = pygame.font.Font(None, 36)
         
+        # Timer for hiding controls after 3 seconds
+        self.start_time = pygame.time.get_ticks()
+        self.show_controls = True
+        self.controls_display_duration = 3000  # 3 seconds in milliseconds
+        
         # Initialize game objects
         self.reset_game()
     
@@ -29,6 +34,10 @@ class SnakeGame:
         self.food.generate_position(self.snake.body)
         self.score = 0
         self.game_over = False
+        
+        # Reset timer when game resets
+        self.start_time = pygame.time.get_ticks()
+        self.show_controls = True
     
     def handle_events(self):
         """Handle pygame events"""
@@ -59,6 +68,11 @@ class SnakeGame:
     
     def update_game(self):
         """Update game state"""
+        # Check if controls should be hidden after 3 seconds
+        current_time = pygame.time.get_ticks()
+        if current_time - self.start_time > self.controls_display_duration:
+            self.show_controls = False
+        
         if self.game_over:
             return
         
@@ -99,9 +113,10 @@ class SnakeGame:
             self.draw_text("Press SPACE to play again", WINDOW_WIDTH//2 - 140, WINDOW_HEIGHT//2 + 60)
             self.draw_text("Press ESC to quit", WINDOW_WIDTH//2 - 100, WINDOW_HEIGHT//2 + 100)
         
-        # Draw controls (always visible)
-        self.draw_text("Controls: Arrow keys or WASD", 10, WINDOW_HEIGHT - 70)
-        self.draw_text("ESC: Quit", 10, WINDOW_HEIGHT - 40)
+        # Draw controls (only for first 3 seconds or during game over)
+        if self.show_controls or self.game_over:
+            self.draw_text("Controls: Arrow keys or WASD", 10, WINDOW_HEIGHT - 70)
+            self.draw_text("ESC: Quit", 10, WINDOW_HEIGHT - 40)
         
         pygame.display.flip()
     
